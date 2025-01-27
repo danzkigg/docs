@@ -227,6 +227,28 @@ PATCH /api/v1/sessions/:sessionId/stop
 ```
 </RequestExample>
 
+<ResponseExample>
+```json
+{
+  "message": "Session force stopped",
+  "session": {
+    "id": "session-uuid",
+    "session_status": "completed"
+  },
+  "events": [
+    {
+      "event_type": "admin_force_stop",
+      "event_data": {
+        "message": "Session force stopped by administrator",
+        "reason": "Maintenance required"
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+```
+
 #### Response
 <ResponseExample>
 ```json
