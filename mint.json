@@ -1,12 +1,13 @@
 {
   "$schema": "https://mintlify.com/schema.json",
   "name": "EV Charging Station API",
+  "favicon": "/favicon.svg",
   "logo": {
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
   "api": {
-    "baseUrl": "https://evcharged.com",
+    "baseUrl": "https://your-api-domain.com",
     "auth": {
       "method": "bearer"
     }
