@@ -1,0 +1,159 @@
+---
+title: 'Update RFID Card'
+openapi: 'PATCH /api/v1/cards/:cardId'
+---
+
+## Overview
+
+Update RFID card information. This endpoint is restricted to admin users.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cardId` | string | Yes | Unique identifier of the RFID card to update |
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "card_identifier": "EVCharged-000002",
+  "user_id": "new-user-uuid",
+  "status": "active"
+}
+```
+</RequestExample>
+
+### Updatable Fields
+
+| Field | Type | Description | Admin Only |
+|-------|------|-------------|------------|
+| `card_identifier` | string | Unique card identifier | Yes |
+| `user_id` | string | User to whom the card is assigned | Yes |
+| `status` | string | Card status (active, blocked) | Yes |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Card updated successfully",
+  "card": {
+    "id": "card-uuid-123",
+    "card_identifier": "EVCharged-000002",
+    "user_id": "new-user-uuid",
+    "status": "active",
+    "updated_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid update | Attempting to update restricted fields |
+| 403 | Forbidden | Non-admin attempting to update card |
+| 404 | Card not found | No card exists with the given ID |
+| 409 | Conflict | Card identifier already in use |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const updateCard = async (cardId, updateData) => {
+  const response = await fetch(`/api/v1/cards/${cardId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update card');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const reassignCard = async (cardId, newUserId) => {
+  try {
+    const updatedCard = await updateCard(cardId, {
+      user_id: newUserId,
+      status: 'active'
+    });
+    console.log('Card reassigned:', updatedCard.card);
+  } catch (error) {
+    console.error('Error updating card:', error);
+  }
+};
+
+// Block a card
+const blockCard = async (cardId) => {
+  try {
+    const blockedCard = await updateCard(cardId, {
+      status: 'blocked'
+    });
+    console.log('Card blocked:', blockedCard.card);
+  } catch (error) {
+    console.error('Error blocking card:', error);
+  }
+};
+```
+
+## Security Considerations
+
+- Only admin users can update card details
+- Prevents unauthorized card reassignment
+- Tracks card update timestamps
+- Validates card identifier uniqueness
+
+## Possible Card Statuses
+
+| Status | Description |
+|--------|-------------|
+| `active` | Card can be used for charging |
+| `blocked` | Card is temporarily disabled |
+| `lost` | Card reported as lost |
+| `stolen` | Card reported as stolen |
+
+## Audit Trail
+
+- Each card update is logged
+- Includes timestamp and administrator information
+- Helps track card management history
+
+## Best Practices
+
+- Verify card ownership before reassignment
+- Communicate status changes to the user
+- Maintain comprehensive documentation
+- Implement multi-step verification for critical changes
+
+## Potential Workflows
+
+1. **Card Reassignment**
+   - Verify current and new user details
+   - Check for existing active sessions
+   - Update card ownership
+   - Notify both users of the change
+
+2. **Card Blocking**
+   - Investigate reason for blocking
+   - Disable all active sessions
+   - Prevent future card usage
+   - Provide clear communication to the user
+
+---
+
+Need assistance with card management? [Contact Support](/support) for help.

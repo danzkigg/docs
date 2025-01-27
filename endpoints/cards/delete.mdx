@@ -1,0 +1,138 @@
+---
+title: 'Delete RFID Card'
+openapi: 'DELETE /api/v1/cards/:cardId'
+---
+
+## Overview
+
+Permanently remove an RFID card from the system. This endpoint is restricted to admin users.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cardId` | string | Yes | Unique identifier of the RFID card to delete |
+
+### Optional Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `force` | boolean | No | Force delete without additional checks |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Card deleted successfully",
+  "deletedCard": {
+    "id": "card-uuid-123",
+    "card_identifier": "EVCharged-000001",
+    "user_id": "user-uuid-456",
+    "deleted_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Non-admin attempting to delete a card |
+| 404 | Card not found | No card exists with the given ID |
+| 409 | Deletion prevented | Card has active sessions or dependencies |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Deletion Behavior
+
+- Permanently removes the card from the system
+- Associated data handling:
+  - Active sessions may be anonymized
+  - Historical usage data is preserved
+  - User associations are cleared
+
+## Example
+
+```javascript
+const deleteCard = async (cardId, force = false) => {
+  const response = await fetch(`/api/v1/cards/${cardId}?force=${force}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete card');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const removeCard = async (cardId) => {
+  try {
+    // Attempt soft delete first
+    const result = await deleteCard(cardId);
+    console.log(result.message);
+  } catch (error) {
+    // If soft delete fails, force delete
+    try {
+      const forceResult = await deleteCard(cardId, true);
+      console.log(forceResult.message);
+    } catch (forceError) {
+      console.error('Error deleting card:', forceError);
+    }
+  }
+};
+```
+
+## Security Considerations
+
+- Only admin users can delete RFID cards
+- Deletion is a permanent, irreversible action
+- Implement proper confirmation mechanisms
+- Audit and log all deletion attempts
+
+## Deletion Scenarios
+
+1. **Standard Deletion**
+   - Card is not actively used
+   - No pending sessions
+   - Smooth removal process
+
+2. **Force Deletion**
+   - Card has pending or recent sessions
+   - Forcefully removes card
+   - Potentially anonymizes associated data
+
+## Compliance and Data Retention
+
+- Follows data protection regulations
+- Maintains audit logs
+- Provides data export options before deletion
+- Supports user data right to erasure
+
+## Workflow Considerations
+
+- Verify user consent
+- Check for any outstanding balances
+- Notify user about card deletion
+- Provide alternative card options
+
+## Best Practices
+
+- Always confirm deletion with the user
+- Provide clear communication
+- Offer card replacement options
+- Maintain comprehensive deletion logs
+
+---
+
+Need help managing RFID cards? [Contact Support](/support) for assistance.

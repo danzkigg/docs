@@ -1,0 +1,139 @@
+---
+title: 'List RFID Cards'
+openapi: 'GET /api/v1/cards'
+---
+
+## Overview
+
+Retrieve a list of RFID cards. Regular users see their own cards, while admins can view all cards.
+
+## Request
+
+No request body is required. Optional query parameters can be used for filtering.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `status` | string | No | Filter cards by status (e.g., 'active', 'blocked') |
+| `user_id` | string | No | Filter cards by specific user (admin only) |
+| `page` | number | No | Page number for pagination (default: 1) |
+| `limit` | number | No | Number of cards per page (default: 10, max: 100) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "cards": [
+    {
+      "id": "card-uuid-1",
+      "card_identifier": "EVCharged-000001",
+      "status": "active",
+      "user": {
+        "id": "user-uuid-1",
+        "email": "user1@example.com",
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "last_used_at": "2024-01-27T09:45:00Z"
+    },
+    {
+      "id": "card-uuid-2",
+      "card_identifier": "EVCharged-000002",
+      "status": "blocked",
+      "user": {
+        "id": "user-uuid-2",
+        "email": "user2@example.com",
+        "firstName": "Jane",
+        "lastName": "Smith"
+      },
+      "last_used_at": null
+    }
+  ],
+  "pagination": {
+    "total": 25,
+    "page": 1,
+    "limit": 10,
+    "total_pages": 3
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to list cards without proper authorization |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const listCards = async (filters = {}) => {
+  // Construct query parameters
+  const queryParams = new URLSearchParams({
+    ...filters,
+    page: filters.page || 1,
+    limit: filters.limit || 10
+  });
+
+  const response = await fetch(`/api/v1/cards?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch cards');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const fetchUserCards = async () => {
+  try {
+    // Fetch active cards
+    const activeCards = await listCards({ status: 'active' });
+    console.log('Active Cards:', activeCards.cards);
+
+    // Fetch first page of cards
+    const allCards = await listCards();
+    console.log('All Cards:', allCards.cards);
+  } catch (error) {
+    console.error('Error fetching cards:', error);
+  }
+};
+
+// Admin: fetch cards for a specific user
+const fetchUserCardsAdmin = async (userId) => {
+  try {
+    const userCards = await listCards({ user_id: userId });
+    console.log('User Cards:', userCards.cards);
+  } catch (error) {
+    console.error('Error fetching user cards:', error);
+  }
+};
+```
+
+## Behavior Notes
+
+- Regular users see only their own cards
+- Admins can view cards for all users
+- Includes associated user information
+- Supports pagination and filtering
+
+## Security Considerations
+
+- Access is restricted based on user role
+- Only necessary user information is exposed
+- Sensitive details are filtered out
+
+---
+
+Need help managing RFID cards? [Contact Support](/support) for assistance.

@@ -1,0 +1,125 @@
+---
+title: 'Get RFID Card'
+openapi: 'GET /api/v1/cards/:cardId'
+---
+
+## Overview
+
+Retrieve detailed information for a specific RFID card. Regular users can only access their own cards, while admins can access any card.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cardId` | string | Yes | Unique identifier of the RFID card |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "card": {
+    "id": "card-uuid-123",
+    "card_identifier": "EVCharged-000001",
+    "status": "active",
+    "user": {
+      "id": "user-uuid-456",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "last_used_at": "2024-01-27T09:45:00Z",
+    "usage_history": {
+      "total_sessions": 24,
+      "total_energy_consumed": 456.7,
+      "total_cost": 275.50
+    },
+    "recent_sessions": [
+      {
+        "id": "session-uuid-1",
+        "start_time": "2024-01-25T14:30:00Z",
+        "end_time": "2024-01-25T16:15:00Z",
+        "station_name": "Downtown Charging Hub",
+        "energy_consumed": 35.6,
+        "cost": 18.75
+      }
+    ],
+    "error_history": [
+      {
+        "timestamp": "2024-01-20T11:15:00Z",
+        "error_code": "CONNECTION_FAILED",
+        "error_message": "Failed to establish charging connection"
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to access another user's card |
+| 404 | Card not found | No card exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getCard = async (cardId) => {
+  const response = await fetch(`/api/v1/cards/${cardId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch card details');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const fetchCardDetails = async (cardId) => {
+  try {
+    const { card } = await getCard(cardId);
+    console.log('Card Details:', card);
+    console.log('Total Sessions:', card.usage_history.total_sessions);
+  } catch (error) {
+    console.error('Error fetching card:', error);
+  }
+};
+```
+
+## Detailed Information
+
+The card details include:
+- Card identification
+- Current status
+- Associated user information
+- Usage history
+- Recent charging sessions
+- Error history
+
+## Access Control
+
+- Regular users can only access their own cards
+- Admins can access any card
+- Sensitive user information is filtered
+
+## Notes
+
+- Provides comprehensive card usage insights
+- Tracks session and error history
+- Helps users and administrators monitor card activity
+
+---
+
+Need assistance with your RFID card? [Contact Support](/support) for help.

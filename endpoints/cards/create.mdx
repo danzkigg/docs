@@ -1,0 +1,127 @@
+---
+title: 'Create RFID Card'
+openapi: 'POST /api/v1/cards'
+---
+
+## Overview
+
+Create a new RFID card for the authenticated user or assign a card to a user (admin only).
+
+## Request
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "card_identifier": "EVCharged-000001"
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `card_identifier` | string | Yes | Unique identifier for the RFID card |
+| `user_id` | string | No | User ID to assign the card (admin only) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Card created",
+  "card": {
+    "id": "card-uuid-123",
+    "user_id": "user-uuid-456",
+    "card_identifier": "EVCharged-000001",
+    "status": "active",
+    "created_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid card identifier | Incorrectly formatted or duplicate identifier |
+| 403 | Forbidden | Attempting to assign card to another user |
+| 409 | Card already exists | Card identifier already in use |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const createCard = async (cardIdentifier) => {
+  const response = await fetch('/api/v1/cards', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ card_identifier: cardIdentifier })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create card');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const addNewCard = async () => {
+  try {
+    // First, get a unique card identifier
+    const { nextIdentifier } = await fetch('/api/v1/cards/next-id').then(res => res.json());
+    
+    // Create the card
+    const cardData = await createCard(nextIdentifier);
+    console.log('New card created:', cardData.card);
+  } catch (error) {
+    console.error('Error creating card:', error);
+  }
+};
+```
+
+## Admin Card Creation
+
+Admins can create a card and assign it to a specific user:
+
+```javascript
+const createAdminCard = async (userId, cardIdentifier) => {
+  const response = await fetch('/api/v1/cards/admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ 
+      user_id: userId, 
+      card_identifier: cardIdentifier 
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create admin card');
+  }
+
+  return await response.json();
+};
+```
+
+## Notes
+
+- Each user can have multiple RFID cards
+- Card identifiers follow a specific format (EVCharged-XXXXXX)
+- Cards are automatically set to active status
+- Admins have additional card assignment capabilities
+
+---
+
+Need assistance? [Contact Support](/support) for RFID card management guidance.
