@@ -1,0 +1,45 @@
+---
+title: 'Error Handling'
+---
+
+# Error Handling
+
+## Overview
+
+All API responses follow a consistent error format to help with debugging and integration.
+
+### Error Response Format
+
+```json
+{
+  "error": "Error message here"
+}
+```
+
+---
+
+## Common Error Codes
+
+### 400 - Bad Request
+
+Occurs when the request is malformed or missing required parameters.
+
+### 401 - Unauthorized
+
+Occurs when the request lacks valid authentication credentials.
+
+### 403 - Forbidden
+
+Occurs when the user does not have permission to access the requested resource.
+
+### 404 - Not Found
+
+Occurs when the requested resource does not exist.
+
+### 500 - Internal Server Error
+
+Occurs when there is an issue on the server side.
+
+For API authentication details, refer to the Authentication Documentation.
+
+
