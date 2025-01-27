@@ -63,35 +63,6 @@ Authorization: Bearer your_access_token_here
 - Used to obtain a new access token when the current one expires
 - Longer-lived (7 days)
 
-## Token Refresh
-
-When an access token expires, use the refresh token to obtain a new access token:
-
-<RequestExample>
-```bash
-POST /api/v1/auth/refresh
-```
-</RequestExample>
-
-#### Response
-<ResponseExample>
-```json
-{
-  "accessToken": "new.jwt.access.token"
-}
-```
-</ResponseExample>
-
-## Logout
-
-To logout and invalidate the refresh token:
-
-<RequestExample>
-```bash
-POST /api/v1/auth/logout
-```
-</RequestExample>
-
 ## Authorization Roles
 
 The API supports multiple user roles:
