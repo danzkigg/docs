@@ -1,0 +1,123 @@
+---
+title: 'Update User'
+openapi: 'PATCH /api/v1/users/:userId'
+---
+
+## Overview
+
+Update user profile information. Admins can update any user's profile, while regular users can only update their own.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | string | Yes | Unique identifier of the user to update |
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "phoneNumber": "+1987654321",
+  "addressLine1": "456 Oak Avenue",
+  "city": "Chicago",
+  "state": "IL",
+  "postalCode": "60601",
+  "preferredPaymentMethod": "debit_card"
+}
+```
+</RequestExample>
+
+### Updatable Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `firstName` | string | User's first name |
+| `lastName` | string | User's last name |
+| `phoneNumber` | string | Contact phone number |
+| `addressLine1` | string | Primary address line |
+| `addressLine2` | string | Secondary address line |
+| `city` | string | User's city |
+| `state` | string | User's state/province |
+| `postalCode` | string | Postal/ZIP code |
+| `preferredPaymentMethod` | string | Preferred payment method |
+| `isActive` | boolean | Account active status (admin only) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "User updated successfully",
+  "user": {
+    "id": "user-uuid-123",
+    "firstName": "John",
+    "lastName": "Smith",
+    "phoneNumber": "+1987654321",
+    "addressLine1": "456 Oak Avenue",
+    "city": "Chicago",
+    "state": "IL",
+    "preferredPaymentMethod": "debit_card"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid update | Attempting to update restricted fields |
+| 403 | Forbidden | Attempting to update another user's profile |
+| 404 | User not found | No user exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const updateUser = async (userId, updateData) => {
+  const response = await fetch(`/api/v1/users/${userId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update user');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const updateProfile = async () => {
+  try {
+    const updatedUser = await updateUser('current-user-id', {
+      phoneNumber: '+1987654321',
+      addressLine1: '456 Oak Avenue',
+      city: 'Chicago',
+      state: 'IL'
+    });
+    console.log(updatedUser.user);
+  } catch (error) {
+    console.error('Error updating profile:', error);
+  }
+};
+```
+
+## Notes
+
+- Partial updates are supported
+- Cannot update email or role through this endpoint
+- Admins can update any user's profile
+- Regular users can only update their own profile
+- Some fields may have validation requirements

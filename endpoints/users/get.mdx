@@ -1,0 +1,107 @@
+---
+title: 'Get User'
+openapi: 'GET /api/v1/users/:userId'
+---
+
+## Overview
+
+Retrieve detailed information for a specific user. Admins can access any user's details, while regular users can only access their own profile.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | string | Yes | Unique identifier of the user |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "user": {
+    "id": "user-uuid-123",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "phoneNumber": "+1234567890",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-15T10:30:00Z",
+    "rfidCards": [
+      {
+        "id": "card-uuid-1",
+        "cardIdentifier": "EVCharged-000001",
+        "status": "active"
+      }
+    ],
+    "sessions": [
+      {
+        "id": "session-uuid-1",
+        "startTime": "2024-01-25T14:30:00Z",
+        "endTime": "2024-01-25T16:15:00Z",
+        "status": "completed"
+      }
+    ],
+    "supportTickets": [
+      {
+        "id": "ticket-uuid-1",
+        "status": "open",
+        "createdAt": "2024-01-20T09:45:00Z"
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to access another user's profile |
+| 404 | User not found | No user exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getUser = async (userId) => {
+  const response = await fetch(`/api/v1/users/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user details');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const fetchUserProfile = async (userId) => {
+  try {
+    const userData = await getUser(userId);
+    console.log(userData.user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }
+};
+```
+
+## Notes
+
+- Admins can access any user's profile
+- Regular users can only access their own profile
+- Returns comprehensive user information including:
+  - Basic profile details
+  - RFID cards
+  - Charging sessions
+  - Support tickets
+- Sensitive information like password hash is never returned

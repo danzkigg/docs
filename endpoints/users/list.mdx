@@ -1,0 +1,107 @@
+---
+title: 'List Users'
+openapi: 'GET /api/v1/users'
+---
+
+## Overview
+
+Retrieve a list of all users in the system. This endpoint is restricted to admin users.
+
+## Request
+
+No request body is required. Optional query parameters can be used for filtering.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | number | No | Page number for pagination (default: 1) |
+| `limit` | number | No | Number of users per page (default: 10, max: 100) |
+| `role` | string | No | Filter users by role (e.g., 'user', 'admin') |
+| `status` | string | No | Filter users by account status (e.g., 'active', 'inactive') |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "users": [
+    {
+      "id": "user-uuid-1",
+      "email": "user1@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "user-uuid-2",
+      "email": "admin1@example.com",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "role": "admin",
+      "isActive": true,
+      "createdAt": "2024-01-10T15:45:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 5
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Non-admin attempting to list users |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const listUsers = async (page = 1, limit = 10, filters = {}) => {
+  const queryParams = new URLSearchParams({
+    page,
+    limit,
+    ...filters
+  });
+
+  const response = await fetch(`/api/v1/users?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const fetchUsers = async () => {
+  try {
+    const userData = await listUsers(1, 10, { role: 'user' });
+    console.log(userData.users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
+```
+
+## Notes
+
+- Only accessible by admin users
+- Supports pagination
+- Can filter users by role and status
+- Returns limited user information for privacy

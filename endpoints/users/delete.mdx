@@ -1,0 +1,111 @@
+---
+title: 'Delete User'
+openapi: 'DELETE /api/v1/users/:userId'
+---
+
+## Overview
+
+Permanently remove a user account from the system. This endpoint is restricted to admin users.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | string | Yes | Unique identifier of the user to delete |
+
+### Optional Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `force` | boolean | No | Force delete without additional checks |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "User deleted successfully",
+  "deletedUser": {
+    "id": "user-uuid-123",
+    "email": "user@example.com",
+    "deletedAt": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Non-admin attempting to delete a user |
+| 404 | User not found | No user exists with the given ID |
+| 409 | Deletion prevented | User has active sessions or dependencies |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Deletion Behavior
+
+- User account is permanently removed from the system
+- Associated data may be handled based on system configuration:
+  - RFID cards may be invalidated
+  - Charging sessions might be anonymized
+  - Support tickets could be preserved or deleted
+
+## Example
+
+```javascript
+const deleteUser = async (userId, force = false) => {
+  const response = await fetch(`/api/v1/users/${userId}?force=${force}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete user');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const removeUser = async (userId) => {
+  try {
+    // Attempt soft delete first
+    const result = await deleteUser(userId);
+    console.log(result.message);
+  } catch (error) {
+    // If soft delete fails, force delete
+    try {
+      const forceResult = await deleteUser(userId, true);
+      console.log(forceResult.message);
+    } catch (forceError) {
+      console.error('Error deleting user:', forceError);
+    }
+  }
+};
+```
+
+## Security Considerations
+
+- Only admin users can delete user accounts
+- Deletion is a permanent, irreversible action
+- Implement proper confirmation mechanisms
+- Audit and log all deletion attempts
+
+## Notes
+
+- Soft delete may be preferred over hard delete
+- Consider data retention policies
+- Provide users with data export options before deletion
+- Implement multi-step verification for user deletion
+
+---
+
+Need assistance? [Contact Support](/support) for user management guidance.

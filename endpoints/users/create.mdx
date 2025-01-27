@@ -1,0 +1,107 @@
+---
+title: 'Create User'
+openapi: 'POST /api/v1/users'
+---
+
+## Overview
+
+Create a new user account in the EV Charging Management system. This endpoint is restricted to admin users.
+
+## Request
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "email": "newuser@example.com",
+  "password": "SecurePassword123!",
+  "role": "user",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phoneNumber": "+1234567890",
+  "addressLine1": "123 Main St",
+  "city": "New York",
+  "state": "NY",
+  "postalCode": "10001",
+  "country": "United States",
+  "preferredPaymentMethod": "credit_card"
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `email` | string | Yes | Unique email address for the user |
+| `password` | string | Yes | User's account password |
+| `role` | string | Yes | User role (e.g., 'user', 'admin') |
+| `firstName` | string | Yes | User's first name |
+| `lastName` | string | Yes | User's last name |
+| `phoneNumber` | string | Yes | User's contact number |
+| `addressLine1` | string | Yes | Primary address line |
+| `addressLine2` | string | No | Secondary address line |
+| `city` | string | Yes | User's city |
+| `state` | string | Yes | User's state/province |
+| `postalCode` | string | Yes | Postal/ZIP code |
+| `country` | string | Yes | User's country |
+| `preferredPaymentMethod` | string | No | Preferred payment method |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": "user-uuid-123",
+    "email": "newuser@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Missing required fields | Incomplete user data |
+| 403 | Forbidden | Non-admin attempting to create user |
+| 409 | User already exists | Email already registered |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const createUser = async (userData) => {
+  const response = await fetch('/api/v1/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(userData)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create user');
+  }
+
+  return await response.json();
+};
+```
+
+## Notes
+
+- Only admin users can create new user accounts
+- Passwords are securely hashed before storage
+- User is automatically set to active status
+- Unique email address is required
