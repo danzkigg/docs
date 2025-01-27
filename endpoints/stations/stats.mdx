@@ -1,0 +1,189 @@
+---
+title: 'Charging Station Statistics'
+openapi: 'GET /api/v1/sessions/station/:stationId/stats'
+---
+
+## Overview
+
+Retrieve comprehensive performance and usage statistics for a specific charging station.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `stationId` | string | Yes | Unique identifier of the charging station |
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from_date` | string | No | Start date for statistics (ISO 8601 format) |
+| `to_date` | string | No | End date for statistics (ISO 8601 format) |
+| `interval` | string | No | Aggregation interval (daily, weekly, monthly) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "stats": {
+    "total_sessions": 150,
+    "successful_sessions": 145,
+    "total_energy": 5420.3,
+    "total_revenue": 2755.50,
+    "average_duration": 45,
+    "connector_performance": [
+      {
+        "connector_type": "CCS",
+        "total_sessions": 100,
+        "energy_delivered": 3620.5,
+        "average_power_output": 120
+      },
+      {
+        "connector_type": "Type2",
+        "total_sessions": 50,
+        "energy_delivered": 1799.8,
+        "average_power_output": 22
+      }
+    ],
+    "time_distribution": {
+      "peak_hours": [
+        {
+          "hour": 17,
+          "sessions": 35,
+          "energy_consumed": 1205.6
+        },
+        {
+          "hour": 8,
+          "sessions": 28,
+          "energy_consumed": 950.3
+        }
+      ]
+    },
+    "status_breakdown": {
+      "available": 95.5,
+      "maintenance": 4.5
+    }
+  },
+  "sessions": [
+    {
+      "id": "session-uuid-1",
+      "start_time": "2024-01-25T14:30:00Z",
+      "end_time": "2024-01-25T16:15:00Z",
+      "energy_consumed": 35.6,
+      "cost": 18.75
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Station not found | No station exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getStationStats = async (stationId, filters = {}) => {
+  // Construct query parameters
+  const queryParams = new URLSearchParams();
+  
+  if (filters.from_date) queryParams.append('from_date', filters.from_date);
+  if (filters.to_date) queryParams.append('to_date', filters.to_date);
+  if (filters.interval) queryParams.append('interval', filters.interval);
+
+  const response = await fetch(`/api/v1/sessions/station/${stationId}/stats?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch station statistics');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const analyzeStationPerformance = async (stationId) => {
+  try {
+    // Fetch current month's statistics
+    const currentDate = new Date();
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    
+    const monthlyStats = await getStationStats(stationId, {
+      from_date: firstDayOfMonth.toISOString(),
+      to_date: currentDate.toISOString(),
+      interval: 'daily'
+    });
+
+    console.log('Total Sessions:', monthlyStats.stats.total_sessions);
+    console.log('Total Energy Delivered:', monthlyStats.stats.total_energy);
+    
+    // Analyze connector performance
+    monthlyStats.stats.connector_performance.forEach(connector => {
+      console.log(`${connector.connector_type} Performance:`, {
+        totalSessions: connector.total_sessions,
+        energyDelivered: connector.energy_delivered
+      });
+    });
+  } catch (error) {
+    console.error('Error analyzing station performance:', error);
+  }
+};
+```
+
+## Statistical Components
+
+### Sessions Statistics
+- Total number of sessions
+- Successful vs. failed sessions
+- Total energy delivered
+- Total revenue generated
+
+### Connector Performance
+- Performance by connector type
+- Energy delivered per connector
+- Average power output
+
+### Time Distribution
+- Peak usage hours
+- Sessions and energy consumption by time
+
+### Availability Metrics
+- Station uptime percentage
+- Maintenance time breakdown
+
+## Filtering Capabilities
+
+- Date range selection
+- Interval-based aggregation
+- Connector-specific analysis
+
+## Performance Insights
+
+- Identify peak usage times
+- Compare connector effectiveness
+- Track station revenue and energy delivery
+- Monitor station availability
+
+## Notes
+
+- Provides comprehensive station performance overview
+- Supports flexible statistical analysis
+- Helps in strategic infrastructure planning
+
+---
+
+Need deeper insights into station performance? [Contact Support](/support) for detailed analysis.

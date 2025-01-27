@@ -1,0 +1,176 @@
+---
+title: 'Get Charging Station'
+openapi: 'GET /api/v1/stations/:stationId'
+---
+
+## Overview
+
+Retrieve detailed information for a specific charging station, including comprehensive station details, connectors, maintenance schedules, and performance metrics.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `stationId` | string | Yes | Unique identifier of the charging station |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "station": {
+    "id": "station-uuid-123",
+    "station_number": "CS001",
+    "name": "Downtown Charging Hub",
+    "description": "Convenient downtown charging station",
+    "status": "available",
+    "installation_date": "2024-01-15",
+    "location": {
+      "lat": 40.7128,
+      "lng": -74.0060,
+      "address": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "postal_code": "10001"
+    },
+    "connectors": [
+      {
+        "id": "connector-uuid-1",
+        "connector_type": "CCS",
+        "power_rating": 150,
+        "status": "available"
+      },
+      {
+        "id": "connector-uuid-2",
+        "connector_type": "Type2",
+        "power_rating": 22,
+        "status": "maintenance"
+      }
+    ],
+    "maintenance_schedules": [
+      {
+        "id": "schedule-uuid-1",
+        "scheduled_date": "2024-02-15",
+        "maintenance_type": "routine_check",
+        "status": "pending",
+        "notes": "Annual preventive maintenance"
+      }
+    ],
+    "station_metrics": [
+      {
+        "timestamp": "2024-01-27T10:00:00Z",
+        "power_output": 120,
+        "temperature": 22.5,
+        "uptime_percentage": 99.5
+      }
+    ],
+    "station_errors": [
+      {
+        "error_code": "CONNECTOR_FAULT",
+        "error_message": "Connector 2 communication error",
+        "created_at": "2024-01-20T11:15:00Z",
+        "resolved": false
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Station not found | No station exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getStation = async (stationId) => {
+  const response = await fetch(`/api/v1/stations/${stationId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch station details');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const fetchStationDetails = async (stationId) => {
+  try {
+    const { station } = await getStation(stationId);
+    console.log('Station Details:', station);
+    
+    // Display connector information
+    station.connectors.forEach(connector => {
+      console.log(`Connector Type: ${connector.connector_type}`);
+      console.log(`Power Rating: ${connector.power_rating} kW`);
+      console.log(`Status: ${connector.status}`);
+    });
+
+    // Check maintenance schedules
+    if (station.maintenance_schedules.length > 0) {
+      console.log('Upcoming Maintenance:', station.maintenance_schedules[0]);
+    }
+  } catch (error) {
+    console.error('Error fetching station:', error);
+  }
+};
+```
+
+## Detailed Information Included
+
+- Basic station information
+- Geographical location
+- Connector details
+  - Types
+  - Power ratings
+  - Individual connector status
+- Maintenance schedules
+- Performance metrics
+- Error logs
+
+## Status Types
+
+| Status | Description |
+|--------|-------------|
+| `available` | Station is fully operational |
+| `maintenance` | Station or some connectors are under maintenance |
+| `error` | Station is experiencing technical issues |
+| `offline` | Station is temporarily out of service |
+
+## Connector Information
+
+Each connector provides:
+- Unique identifier
+- Connector type
+- Power rating
+- Current status
+
+## Maintenance and Performance Tracking
+
+- Detailed maintenance schedule
+- Historical performance metrics
+- Error tracking and resolution status
+
+## Notes
+
+- Provides comprehensive station information
+- Includes operational and technical details
+- Helps in monitoring station health and performance
+
+---
+
+Need more information about a charging station? [Contact Support](/support) for assistance.

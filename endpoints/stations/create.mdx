@@ -1,0 +1,161 @@
+---
+title: 'Create Charging Station'
+openapi: 'POST /api/v1/stations'
+---
+
+## Overview
+
+Create a new charging station in the EV Charging Management system. This endpoint is restricted to admin users.
+
+## Request
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "station_number": "CS001",
+  "name": "Downtown Charging Hub",
+  "location": {
+    "lat": 40.7128,
+    "lng": -74.0060,
+    "address": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "postal_code": "10001"
+  },
+  "description": "Convenient downtown charging station",
+  "installation_date": "2024-01-27",
+  "connectors": [
+    {
+      "connector_type": "CCS",
+      "power_rating": 150,
+      "status": "available"
+    }
+  ]
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `station_number` | string | Yes | Unique identifier for the charging station |
+| `name` | string | Yes | Station name |
+| `location` | object | Yes | Geographical location details |
+| `location.lat` | number | Yes | Latitude coordinate |
+| `location.lng` | number | Yes | Longitude coordinate |
+| `location.address` | string | Yes | Street address |
+| `location.city` | string | Yes | City name |
+| `location.state` | string | Yes | State or province |
+| `location.postal_code` | string | Yes | Postal code |
+| `description` | string | No | Additional station details |
+| `installation_date` | string | Yes | Date of station installation (YYYY-MM-DD) |
+| `connectors` | array | Yes | List of charging connectors |
+| `connectors[].connector_type` | string | Yes | Type of connector (CCS, Type2, etc.) |
+| `connectors[].power_rating` | number | Yes | Power rating in kW |
+| `connectors[].status` | string | Yes | Current connector status |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Station created successfully",
+  "station": {
+    "id": "station-uuid-123",
+    "station_number": "CS001",
+    "name": "Downtown Charging Hub",
+    "status": "available",
+    "created_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid station data | Incomplete or incorrect station information |
+| 403 | Forbidden | Non-admin attempting to create station |
+| 409 | Station already exists | Duplicate station number |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const createStation = async (stationData) => {
+  const response = await fetch('/api/v1/stations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(stationData)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create station');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const addNewStation = async () => {
+  try {
+    const newStation = await createStation({
+      station_number: 'CS001',
+      name: 'Downtown Charging Hub',
+      location: {
+        lat: 40.7128,
+        lng: -74.0060,
+        address: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        postal_code: '10001'
+      },
+      description: 'Convenient downtown charging station',
+      installation_date: '2024-01-27',
+      connectors: [
+        {
+          connector_type: 'CCS',
+          power_rating: 150,
+          status: 'available'
+        }
+      ]
+    });
+    console.log('New station created:', newStation.station);
+  } catch (error) {
+    console.error('Error creating station:', error);
+  }
+};
+```
+
+## Supported Connector Types
+
+- `Type1` (J1772)
+- `Type2` (Mennekes)
+- `CHAdeMO`
+- `CCS` (Combo)
+- `Tesla`
+
+## Supported Power Ratings
+
+- AC Charging: 3.7 kW, 7.4 kW, 11 kW, 22 kW
+- DC Charging: 50 kW, 150 kW, 350 kW
+
+## Notes
+
+- Station creation requires comprehensive location details
+- Multiple connectors can be added during creation
+- Unique station number is mandatory
+- Installation date helps track station lifecycle
+
+---
+
+Need assistance? [Contact Support](/support) for station management guidance.

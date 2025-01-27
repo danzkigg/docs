@@ -1,0 +1,145 @@
+---
+title: 'Delete Charging Station'
+openapi: 'DELETE /api/v1/stations/:stationId'
+---
+
+## Overview
+
+Permanently remove a charging station from the system. This endpoint is restricted to admin users.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `stationId` | string | Yes | Unique identifier of the charging station to delete |
+
+### Optional Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `force` | boolean | No | Force delete without additional checks |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Station deleted successfully",
+  "deletedStation": {
+    "id": "station-uuid-123",
+    "station_number": "CS001",
+    "name": "Downtown Charging Hub",
+    "deleted_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Non-admin attempting to delete a station |
+| 404 | Station not found | No station exists with the given ID |
+| 409 | Deletion prevented | Station has active sessions or dependencies |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Deletion Behavior
+
+- Permanently removes the station from the system
+- Associated data handling:
+  - Active sessions may be anonymized
+  - Historical usage data is preserved
+  - Connector information is removed
+  - Maintenance schedules are archived
+
+## Example
+
+```javascript
+const deleteStation = async (stationId, force = false) => {
+  const response = await fetch(`/api/v1/stations/${stationId}?force=${force}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to delete station');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const removeStation = async (stationId) => {
+  try {
+    // Attempt soft delete first
+    const result = await deleteStation(stationId);
+    console.log(result.message);
+  } catch (error) {
+    // If soft delete fails, force delete
+    try {
+      const forceResult = await deleteStation(stationId, true);
+      console.log(forceResult.message);
+    } catch (forceError) {
+      console.error('Error deleting station:', forceError);
+    }
+  }
+};
+```
+
+## Deletion Scenarios
+
+1. **Standard Deletion**
+   - No active charging sessions
+   - No pending maintenance
+   - Smooth removal process
+
+2. **Force Deletion**
+   - Stations with active sessions
+   - Pending maintenance schedules
+   - Forcefully removes all associated data
+
+## Compliance and Data Management
+
+- Follows data protection regulations
+- Maintains comprehensive deletion logs
+- Supports data archival and retention policies
+- Provides audit trail for administrative actions
+
+## Workflow Considerations
+
+- Verify no active charging sessions
+- Check for any financial implications
+- Notify relevant stakeholders
+- Provide alternative station options
+
+## Best Practices
+
+- Confirm deletion with multiple administrators
+- Ensure all active sessions are completed
+- Archive critical station historical data
+- Communicate station removal to users
+
+## Potential Risks
+
+- Loss of historical charging data
+- Disruption to charging infrastructure
+- Impact on user expectations
+- Potential revenue implications
+
+## Notes
+
+- Irreversible action
+- Requires comprehensive administrative review
+- Impacts overall charging network management
+
+---
+
+Need assistance with station management? [Contact Support](/support) for guidance.

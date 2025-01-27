@@ -1,0 +1,181 @@
+---
+title: 'Update Charging Station'
+openapi: 'PATCH /api/v1/stations/:stationId'
+---
+
+## Overview
+
+Update charging station information. This endpoint is restricted to admin users and allows partial or full station updates.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `stationId` | string | Yes | Unique identifier of the charging station to update |
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "name": "Updated Downtown Charging Hub",
+  "status": "maintenance",
+  "location": {
+    "address": "125 Main St",
+    "city": "New York",
+    "state": "NY"
+  },
+  "connectors": [
+    {
+      "connector_type": "CCS",
+      "power_rating": 150,
+      "status": "maintenance"
+    }
+  ]
+}
+```
+</RequestExample>
+
+### Updatable Fields
+
+| Field | Type | Description | Admin Only |
+|-------|------|-------------|------------|
+| `name` | string | Station name | No |
+| `description` | string | Station description | No |
+| `status` | string | Station operational status | Yes |
+| `location` | object | Geographical location details | Yes |
+| `connectors` | array | List of charging connectors | Yes |
+| `installation_date` | string | Date of station installation | Yes |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Station updated successfully",
+  "station": {
+    "id": "station-uuid-123",
+    "name": "Updated Downtown Charging Hub",
+    "status": "maintenance",
+    "updated_at": "2024-01-27T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid update | Incorrect or incomplete update data |
+| 403 | Forbidden | Non-admin attempting to update station |
+| 404 | Station not found | No station exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const updateStation = async (stationId, updateData) => {
+  const response = await fetch(`/api/v1/stations/${stationId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to update station');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const maintainStation = async (stationId) => {
+  try {
+    // Update station status to maintenance
+    const updatedStation = await updateStation(stationId, {
+      status: 'maintenance',
+      connectors: [
+        {
+          connector_type: 'CCS',
+          power_rating: 150,
+          status: 'maintenance'
+        }
+      ]
+    });
+    console.log('Station updated:', updatedStation.station);
+  } catch (error) {
+    console.error('Error updating station:', error);
+  }
+};
+
+const updateStationDetails = async (stationId) => {
+  try {
+    // Update station name and location
+    const updatedStation = await updateStation(stationId, {
+      name: 'New Downtown Charging Location',
+      location: {
+        address: '125 Main St',
+        city: 'New York',
+        state: 'NY',
+        postal_code: '10001'
+      }
+    });
+    console.log('Station details updated:', updatedStation.station);
+  } catch (error) {
+    console.error('Error updating station details:', error);
+  }
+};
+```
+
+## Station Status Options
+
+| Status | Description |
+|--------|-------------|
+| `available` | Fully operational |
+| `maintenance` | Temporarily out of service |
+| `error` | Technical issues detected |
+| `offline` | Not currently in use |
+
+## Connector Update Considerations
+
+- Entire connector list can be replaced
+- Individual connector updates supported
+- Connector type and power rating can be modified
+- Status changes tracked
+
+## Workflow Recommendations
+
+1. **Maintenance Preparation**
+   - Set station status to maintenance
+   - Update individual connector statuses
+   - Schedule maintenance tasks
+
+2. **Location Updates**
+   - Verify address accuracy
+   - Update geographical coordinates
+   - Ensure minimal service disruption
+
+## Audit Trail
+
+- Each update is logged
+- Includes timestamp and administrator information
+- Helps track station management history
+
+## Notes
+
+- Partial updates are supported
+- Comprehensive validation of update data
+- Maintains data integrity and historical tracking
+
+---
+
+Need assistance with station updates? [Contact Support](/support) for help.

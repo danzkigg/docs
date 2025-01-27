@@ -1,0 +1,163 @@
+---
+title: 'List Charging Stations'
+openapi: 'GET /api/v1/stations'
+---
+
+## Overview
+
+Retrieve a list of charging stations. Users can view available stations with optional filtering and pagination.
+
+## Request
+
+No request body is required. Optional query parameters can be used for filtering.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | number | No | Page number for pagination (default: 1) |
+| `limit` | number | No | Number of stations per page (default: 10, max: 100) |
+| `status` | string | No | Filter stations by status (e.g., 'available', 'maintenance') |
+| `city` | string | No | Filter stations by city |
+| `state` | string | No | Filter stations by state |
+| `connector_type` | string | No | Filter by specific connector type |
+| `min_power_rating` | number | No | Minimum power rating of connectors |
+| `latitude` | number | No | Nearby stations search (requires longitude) |
+| `longitude` | number | No | Nearby stations search (requires latitude) |
+| `radius` | number | No | Search radius in kilometers (default: 10) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "stations": [
+    {
+      "id": "station-uuid-1",
+      "station_number": "CS001",
+      "name": "Downtown Charging Hub",
+      "location": {
+        "city": "New York",
+        "state": "NY",
+        "lat": 40.7128,
+        "lng": -74.0060
+      },
+      "status": "available",
+      "connectors": [
+        {
+          "connector_type": "CCS",
+          "power_rating": 150,
+          "status": "available"
+        }
+      ]
+    },
+    {
+      "id": "station-uuid-2",
+      "station_number": "CS002",
+      "name": "Suburban Charging Point",
+      "location": {
+        "city": "Brooklyn",
+        "state": "NY",
+        "lat": 40.6782,
+        "lng": -73.9442
+      },
+      "status": "maintenance"
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "limit": 10,
+    "total_pages": 5
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid parameters | Incorrect query parameter values |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const listStations = async (filters = {}) => {
+  // Construct query parameters
+  const queryParams = new URLSearchParams({
+    page: filters.page || 1,
+    limit: filters.limit || 10,
+    ...Object.fromEntries(
+      Object.entries(filters).filter(([_, v]) => v != null)
+    )
+  });
+
+  const response = await fetch(`/api/v1/stations?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch stations');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const fetchStations = async () => {
+  try {
+    // Fetch available stations in New York
+    const availableStations = await listStations({
+      status: 'available',
+      state: 'NY'
+    });
+    console.log('Available Stations:', availableStations.stations);
+
+    // Fetch stations with CCS connectors
+    const ccsStations = await listStations({
+      connector_type: 'CCS'
+    });
+    console.log('CCS Stations:', ccsStations.stations);
+
+    // Find nearby stations
+    const nearbyStations = await listStations({
+      latitude: 40.7128,
+      longitude: -74.0060,
+      radius: 20
+    });
+    console.log('Nearby Stations:', nearbyStations.stations);
+  } catch (error) {
+    console.error('Error fetching stations:', error);
+  }
+};
+```
+
+## Filtering Capabilities
+
+- Filter by station status
+- Geographic filtering (city, state, nearby)
+- Connector type and power rating selection
+- Supports flexible search parameters
+
+## Performance Considerations
+
+- Default limit of 10 stations per request
+- Maximum of 100 stations per request
+- Pagination support for large result sets
+
+## Notes
+
+- Returns basic station information
+- Detailed station information available via individual station endpoint
+- Supports comprehensive filtering options
+
+---
+
+Need help finding charging stations? [Contact Support](/support) for assistance.
