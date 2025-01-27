@@ -19,7 +19,8 @@
         "introduction",
         "authentication",
         "rfid-cards",
-        "charging-sessions"
+        "charging-sessions",
+        "charging-stations"
       ]
     },
     {

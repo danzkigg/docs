@@ -1,0 +1,330 @@
+---
+title: 'Charging Stations'
+description: 'Manage and track electric vehicle charging stations'
+---
+
+# Charging Stations
+
+## Overview
+
+Charging stations are the core infrastructure of the electric vehicle charging network. This API provides comprehensive tools to manage, monitor, and interact with charging station details, connectors, and performance.
+
+## Station Characteristics
+
+### Supported Connector Types
+- **Type 1 (J1772)**: Standard AC charging
+- **Type 2 (Mennekes)**: Advanced AC charging
+- **CHAdeMO**: DC fast charging
+- **CCS (Combo)**: Universal DC fast charging
+- **Tesla**: Proprietary Tesla charging connector
+
+### Power Ratings
+- **AC Charging**: 3.7 kW, 7.4 kW, 11 kW, 22 kW
+- **DC Charging**: 50 kW, 150 kW, 350 kW
+
+## Endpoints
+
+### Create a Charging Station
+
+<RequestExample>
+```bash
+POST /api/v1/stations
+```
+
+```json
+{
+  "station_number": "CS001",
+  "name": "Downtown Charging Hub",
+  "location": {
+    "lat": 40.7128,
+    "lng": -74.0060,
+    "address": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "postal_code": "10001"
+  },
+  "description": "Convenient downtown charging station",
+  "installation_date": "2024-01-27",
+  "connectors": [
+    {
+      "connector_type": "CCS",
+      "power_rating": 150,
+      "status": "available"
+    }
+  ]
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Station created successfully",
+  "station": {
+    "id": "station-uuid",
+    "station_number": "CS001",
+    "name": "Downtown Charging Hub",
+    "status": "available"
+  }
+}
+```
+</ResponseExample>
+
+### Get Station Details
+
+<RequestExample>
+```bash
+GET /api/v1/stations/:stationId
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "station": {
+    "id": "station-uuid",
+    "station_number": "CS001",
+    "name": "Downtown Charging Hub",
+    "location": {
+      "lat": 40.7128,
+      "lng": -74.0060,
+      "address": "123 Main St",
+      "city": "New York",
+      "state": "NY"
+    },
+    "status": "available",
+    "connectors": [
+      {
+        "id": "connector-uuid",
+        "connector_type": "CCS",
+        "power_rating": 150,
+        "status": "available"
+      }
+    ],
+    "maintenance_schedules": [
+      {
+        "scheduled_date": "2024-02-15",
+        "maintenance_type": "routine_check",
+        "status": "pending"
+      }
+    ],
+    "station_metrics": [
+      {
+        "timestamp": "2024-01-27T10:00:00Z",
+        "power_output": 120,
+        "temperature": 22.5,
+        "uptime_percentage": 99.5
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
+
+### List Stations
+
+<RequestExample>
+```bash
+GET /api/v1/stations
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "stations": [
+    {
+      "id": "station-uuid-1",
+      "station_number": "CS001",
+      "name": "Downtown Charging Hub",
+      "location": {
+        "city": "New York",
+        "state": "NY"
+      },
+      "status": "available"
+    },
+    {
+      "id": "station-uuid-2",
+      "station_number": "CS002",
+      "name": "Suburban Charging Point",
+      "location": {
+        "city": "Brooklyn",
+        "state": "NY"
+      },
+      "status": "maintenance"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Update a Station
+
+<RequestExample>
+```bash
+PATCH /api/v1/stations/:stationId
+```
+
+```json
+{
+  "name": "Updated Charging Hub",
+  "status": "maintenance",
+  "connectors": [
+    {
+      "connector_type": "CCS",
+      "power_rating": 150,
+      "status": "maintenance"
+    }
+  ]
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Station updated successfully",
+  "station": {
+    "id": "station-uuid",
+    "name": "Updated Charging Hub",
+    "status": "maintenance"
+  }
+}
+```
+</ResponseExample>
+
+### Delete a Station
+
+<RequestExample>
+```bash
+DELETE /api/v1/stations/:stationId
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Station deleted successfully"
+}
+```
+</ResponseExample>
+
+### Get Station Statistics
+
+<RequestExample>
+```bash
+GET /api/v1/sessions/station/:stationId/stats
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "stats": {
+    "total_sessions": 150,
+    "successful_sessions": 145,
+    "total_energy": 5420.3,
+    "total_revenue": 2755.50,
+    "average_duration": 45 // minutes
+  },
+  "sessions": [...]
+}
+```
+</ResponseExample>
+
+## Station Status
+
+### Possible Statuses
+- **Available**: Station is operational and ready for use
+- **Maintenance**: Station is undergoing routine maintenance
+- **Error**: Station has technical issues
+- **Offline**: Station is temporarily out of service
+
+## Connector Management
+
+Each station can have multiple connectors with different:
+- Connector Types
+- Power Ratings
+- Individual Statuses
+
+## Utility Functions
+
+The API provides utility functions to help with station management:
+
+### Distance Calculation
+Calculate distance between two coordinates:
+```javascript
+calculateDistance(lat1, lon1, lat2, lon2)
+// Returns distance in kilometers
+```
+
+### Power Rate Estimation
+Get power consumption rate:
+```javascript
+getPowerRate(connectorType, powerRating)
+// Returns kW rate for charging
+```
+
+### Charging Time Estimation
+Estimate charging duration:
+```javascript
+estimateChargingTime(
+  batteryCapacity, 
+  currentLevel, 
+  targetLevel, 
+  connectorType, 
+  powerRating
+)
+// Returns estimated charging time in minutes
+```
+
+## Best Practices
+
+- Regularly update station status
+- Monitor connector availability
+- Implement maintenance scheduling
+- Track performance metrics
+- Ensure accurate location data
+
+## Common Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid station data | Incorrect station information |
+| 403 | Not authorized | Insufficient permissions |
+| 404 | Station not found | Requested station does not exist |
+| 500 | Server error | Internal processing error |
+
+## Code Example: Station Management
+
+```javascript
+// Create a new charging station
+const createStation = async (stationData) => {
+  const response = await fetch('/api/v1/stations', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(stationData)
+  });
+
+  return await response.json();
+};
+
+// Get station statistics
+const getStationStats = async (stationId) => {
+  const response = await fetch(`/api/v1/sessions/station/${stationId}/stats`);
+  return await response.json();
+};
+```
+
+---
+
+Need more details? [Contact Support](/support) for assistance with charging stations.
