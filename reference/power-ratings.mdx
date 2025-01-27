@@ -1,0 +1,126 @@
+---
+title: 'Power Ratings'
+description: 'Comprehensive guide to electric vehicle charging power ratings'
+---
+
+# EV Charging Power Ratings
+
+## Overview
+
+Power ratings determine the speed and efficiency of electric vehicle charging. Understanding these ratings is crucial for optimal charging strategy.
+
+## Charging Types
+
+### AC (Alternating Current) Charging
+Slower, typically used for home and workplace charging.
+
+| Power Rating | Voltage | Typical Use | Charging Speed | Typical Scenario |
+|--------------|---------|-------------|----------------|-----------------|
+| 3.7 kW | Single-Phase | Home Charging | Slow | Overnight Charging |
+| 7.4 kW | Single-Phase | Home/Workplace | Medium | 4-6 Hours Full Charge |
+| 11 kW | Three-Phase | Commercial | Medium-Fast | 2-3 Hours Full Charge |
+| 22 kW | Three-Phase | Public Stations | Fast | 1-2 Hours Full Charge |
+
+### DC (Direct Current) Charging
+Rapid charging, typically used in public charging stations.
+
+| Power Rating | Charging Type | Typical Use | Charging Speed | Range Added per Hour |
+|--------------|--------------|-------------|----------------|----------------------|
+| 50 kW | Fast Charging | Highway Stations | Very Fast | 200-250 miles |
+| 150 kW | Ultra-Fast | Advanced Stations | Extremely Fast | 500-600 miles |
+| 350 kW | Extreme Fast | Next-Gen Stations | Near-Instantaneous | 700-800 miles |
+
+## Battery Capacity Considerations
+
+### Battery Size Examples
+- **Small EV**: 40 kWh (e.g., Nissan Leaf)
+- **Medium EV**: 75 kWh (e.g., Tesla Model 3)
+- **Large EV**: 100 kWh (e.g., Tesla Model S)
+
+### Charging Time Calculation
+
+Example for a 75 kWh battery:
+- **3.7 kW Charger**: ~20 hours
+- **7.4 kW Charger**: ~10 hours
+- **22 kW Charger**: ~3.5 hours
+- **150 kW DC Charger**: ~30 minutes
+
+## Factors Affecting Charging Speed
+
+1. **Battery Capacity**
+2. **Charger Power Rating**
+3. **Vehicle Charging Limitations**
+4. **Battery Temperature**
+5. **State of Charge**
+
+## API Power Rating Representation
+
+In our API, power ratings are represented as numeric values:
+
+```json
+{
+  "connector_type": "CCS",
+  "power_ratings": [
+    3.7,   // Slow AC
+    7.4,   // Standard AC
+    11.0,  // Three-Phase AC
+    22.0,  // Fast AC
+    50.0,  // DC Fast
+    150.0, // DC Ultra-Fast
+    350.0  // DC Extreme Fast
+  ]
+}
+```
+
+## Charging Efficiency
+
+### Charging Curve
+- Charging is fastest between 20-80% battery
+- Slows down near full capacity
+- Temperature affects charging efficiency
+
+### Efficiency Factors
+- Battery chemistry
+- Ambient temperature
+- Charging infrastructure
+- Vehicle design
+
+## Cost Considerations
+
+| Charging Level | Typical Cost per kWh | Notes |
+|---------------|----------------------|-------|
+| Home Charging | $0.13 | Cheapest option |
+| Public AC | $0.25-$0.40 | Moderate cost |
+| Public DC Fast | $0.40-$0.60 | Most expensive |
+
+## Environmental Impact
+
+- Lower power ratings generally more energy-efficient
+- DC fast charging has higher environmental cost
+- Consider charging during off-peak hours
+
+## Future Trends
+
+- Increasing power ratings
+- Faster charging technologies
+- More efficient battery designs
+- Vehicle-to-grid (V2G) capabilities
+
+## Best Practices
+
+1. Know your vehicle's charging capabilities
+2. Plan charging around battery size and trip needs
+3. Use appropriate power ratings
+4. Consider charging infrastructure
+5. Monitor battery health
+
+## Safety Considerations
+
+- Always use certified charging equipment
+- Follow manufacturer recommendations
+- Monitor charging process
+- Avoid extreme temperatures
+
+---
+
+Need personalized charging advice? [Contact Support](/support) for expert guidance.

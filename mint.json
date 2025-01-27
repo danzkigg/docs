@@ -92,6 +92,12 @@
         "reference/connector-types",
         "reference/power-ratings"
       ]
+    },
+    {
+      "group": "Support",
+      "pages": [
+        "support"
+      ]
     }
   ],
   "colors": {

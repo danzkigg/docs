@@ -1,0 +1,91 @@
+---
+title: 'Error Codes'
+description: 'Comprehensive list of error codes in the EV Charging Management API'
+---
+
+# API Error Codes
+
+## Authentication Errors (4xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `AUTH_001` | 401 | Invalid credentials | Verify email and password |
+| `AUTH_002` | 403 | Insufficient permissions | Check user role and access rights |
+| `AUTH_003` | 401 | Token expired | Refresh access token |
+| `AUTH_004` | 429 | Too many login attempts | Wait and retry, or reset password |
+
+## Session Errors (5xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `SESSION_001` | 400 | Invalid session initialization | Verify card and station details |
+| `SESSION_002` | 409 | Conflicting active session | End existing session before starting new one |
+| `SESSION_003` | 403 | Unauthorized session termination | Ensure proper user authentication |
+| `SESSION_004` | 500 | Session processing error | Contact support |
+
+## Station Errors (6xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `STATION_001` | 404 | Station not found | Verify station identifier |
+| `STATION_002` | 400 | Invalid station configuration | Check station details |
+| `STATION_003` | 403 | Station maintenance mode | Wait for station to become available |
+| `STATION_004` | 409 | Connector unavailable | Select alternative connector |
+
+## Card Errors (7xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `CARD_001` | 400 | Invalid card identifier | Verify card details |
+| `CARD_002` | 403 | Card blocked | Contact administrator |
+| `CARD_003` | 404 | Card not registered | Register the card first |
+| `CARD_004` | 409 | Card already in use | Wait or use alternative card |
+
+## Billing Errors (8xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `BILLING_001` | 400 | Payment method invalid | Update payment information |
+| `BILLING_002` | 402 | Insufficient funds | Add funds or use alternative payment method |
+| `BILLING_003` | 500 | Billing system error | Contact support |
+
+## Network and Connectivity Errors (9xx)
+
+| Error Code | HTTP Status | Description | Potential Solution |
+|-----------|-------------|-------------|-------------------|
+| `NETWORK_001` | 503 | Service unavailable | Retry after a short wait |
+| `NETWORK_002` | 504 | Gateway timeout | Check network connection |
+| `NETWORK_003` | 500 | Internal server error | Contact support |
+
+## Example Error Response
+
+```json
+{
+  "error": {
+    "code": "AUTH_001",
+    "message": "Invalid credentials",
+    "details": "The provided email or password is incorrect",
+    "timestamp": "2024-01-27T10:30:00Z",
+    "request_id": "unique-request-identifier"
+  }
+}
+```
+
+## Handling Errors
+
+1. Always check the error code and message
+2. Implement proper error handling in your application
+3. Provide clear feedback to users
+4. Log errors for debugging
+5. Use appropriate retry mechanisms
+
+## Best Practices
+
+- Log all error codes for troubleshooting
+- Implement graceful error handling
+- Provide user-friendly error messages
+- Use error codes for systematic problem identification
+
+---
+
+Need help understanding an error? [Contact Support](/support) for detailed assistance.

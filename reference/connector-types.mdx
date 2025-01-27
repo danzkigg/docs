@@ -1,0 +1,128 @@
+---
+title: 'Connector Types'
+description: 'Comprehensive guide to electric vehicle charging connector types'
+---
+
+# EV Charging Connector Types
+
+## Overview
+
+Electric vehicle charging connectors vary by region, vehicle manufacturer, and charging technology. Our API supports multiple connector types to ensure wide compatibility.
+
+## Supported Connector Types
+
+### 1. Type 1 (J1772)
+- **Region**: Primarily North America
+- **Charging Type**: AC (Alternating Current)
+- **Max Power**: Up to 7.4 kW
+- **Characteristics**:
+  - Standard for most American electric vehicles
+  - Single-phase charging
+  - Widely used in older EV models
+
+### 2. Type 2 (Mennekes)
+- **Region**: Europe
+- **Charging Type**: AC (Alternating Current)
+- **Max Power**: Up to 22 kW (three-phase)
+- **Characteristics**:
+  - European standard connector
+  - Supports single and three-phase charging
+  - Mandatory in many European countries
+
+### 3. CHAdeMO
+- **Region**: Japan, International
+- **Charging Type**: DC (Direct Current)
+- **Max Power**: Up to 50 kW (standard), 150 kW (fast charging)
+- **Characteristics**:
+  - Developed by Japanese manufacturers
+  - Primarily used in Asian markets
+  - Supports bidirectional charging
+
+### 4. CCS (Combined Charging System)
+- **Region**: Global
+- **Charging Type**: DC (Direct Current)
+- **Max Power**: Up to 350 kW
+- **Characteristics**:
+  - Combines AC and DC charging in one connector
+  - Becoming the global standard
+  - Supports rapid charging
+  - Two variants: CCS1 (North America) and CCS2 (Europe)
+
+### 5. Tesla Connector
+- **Region**: Global (Tesla vehicles)
+- **Charging Type**: AC and DC
+- **Max Power**: Up to 250 kW
+- **Characteristics**:
+  - Proprietary Tesla technology
+  - Used exclusively in Tesla vehicles
+  - Supports Supercharger network
+  - Different designs for different regions
+
+## Comparison Table
+
+| Connector | Type | Region | Max Power | Charging Speed |
+|-----------|------|--------|-----------|----------------|
+| Type 1 | AC | North America | 7.4 kW | Slow |
+| Type 2 | AC | Europe | 22 kW | Medium |
+| CHAdeMO | DC | Japan | 50-150 kW | Fast |
+| CCS | DC | Global | 350 kW | Ultra-Fast |
+| Tesla | AC/DC | Global | 250 kW | Ultra-Fast |
+
+## Charging Power Levels
+
+### AC Charging
+- **Level 1**: 1.4-3.7 kW (Slow)
+- **Level 2**: 7.4-22 kW (Medium)
+
+### DC Charging
+- **Level 3**: 50-150 kW (Fast)
+- **Level 4**: 150-350 kW (Ultra-Fast)
+
+## Adapter Compatibility
+
+Many modern electric vehicles support multiple connector types through adapters:
+- Tesla vehicles can use CCS adapters
+- Some European EVs support Type 1 and Type 2
+- Adapters help increase charging flexibility
+
+## API Connector Type Handling
+
+When using our API, you can specify connector types using these standardized codes:
+- `Type1`
+- `Type2`
+- `CHAdeMO`
+- `CCS`
+- `Tesla`
+
+### Example API Request
+
+```json
+{
+  "connector_type": "CCS",
+  "power_rating": 150,
+  "status": "available"
+}
+```
+
+## Future Developments
+
+- Increasing standardization of connectors
+- Higher power charging capabilities
+- More universal adapter solutions
+
+## Regional Considerations
+
+- Different regions have different charging standards
+- Always verify local connector compatibility
+- Check vehicle and charging station specifications
+
+## Best Practices
+
+- Understand your vehicle's connector type
+- Check charging station compatibility
+- Use appropriate adapters when needed
+- Consider future charging infrastructure developments
+
+---
+
+Need help understanding charging connectors? [Contact Support](/support) for detailed guidance.
