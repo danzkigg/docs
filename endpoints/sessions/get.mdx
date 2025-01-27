@@ -1,0 +1,153 @@
+---
+title: 'Get Charging Session'
+openapi: 'GET /api/v1/sessions/:sessionId'
+---
+
+## Overview
+
+Retrieve detailed information for a specific charging session. Users can access their own sessions, while admins can access any session.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | Yes | Unique identifier of the charging session |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "session": {
+    "id": "session-uuid-789",
+    "card_id": "card-uuid-123",
+    "station_id": "station-uuid-456",
+    "user_id": "user-uuid-789",
+    "start_time": "2024-01-27T10:30:00Z",
+    "end_time": "2024-01-27T12:30:00Z",
+    "session_status": "completed",
+    "vehicle_info": {
+      "vehicle_type": "Electric Sedan",
+      "vehicle_make": "Tesla",
+      "vehicle_model": "Model 3",
+      "initial_battery_level": 20,
+      "final_battery_level": 80
+    },
+    "charging_details": {
+      "energy_consumed": 45.2,
+      "cost": 25.50,
+      "charging_duration": 120,
+      "average_power": 22.6
+    },
+    "station_details": {
+      "station_name": "Downtown Charging Hub",
+      "location": {
+        "city": "New York",
+        "state": "NY"
+      }
+    },
+    "billing_details": {
+      "rate_per_kwh": 0.55,
+      "tax_rate": 0.08,
+      "payment_method": "credit_card"
+    }
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to access another user's session |
+| 404 | Session not found | No session exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getSession = async (sessionId) => {
+  const response = await fetch(`/api/v1/sessions/${sessionId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch session details');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const fetchSessionDetails = async (sessionId) => {
+  try {
+    const { session } = await getSession(sessionId);
+    console.log('Session Details:', session);
+    
+    // Display key charging information
+    console.log('Energy Consumed:', session.charging_details.energy_consumed);
+    console.log('Total Cost:', session.charging_details.cost);
+    console.log('Vehicle:', `${session.vehicle_info.vehicle_make} ${session.vehicle_info.vehicle_model}`);
+  } catch (error) {
+    console.error('Error fetching session:', error);
+  }
+};
+```
+
+## Detailed Session Information
+
+Comprehensive session details include:
+- Session identification
+- User and card information
+- Charging station details
+- Vehicle specifics
+- Charging metrics
+- Billing information
+
+## Session Status Explanation
+
+| Status | Description |
+|--------|-------------|
+| `active` | Ongoing charging session |
+| `completed` | Successfully finished session |
+| `failed` | Session terminated with errors |
+| `interrupted` | Session stopped unexpectedly |
+
+## Charging Metrics Breakdown
+
+- Total energy consumption
+- Charging duration
+- Average power output
+- Initial and final battery levels
+- Cost calculation
+
+## Billing Components
+
+- Energy consumption rate
+- Tax calculations
+- Payment method
+- Total session cost
+
+## Access Control
+
+- Users can only access their own sessions
+- Admins can access any session
+- Sensitive information is carefully filtered
+
+## Notes
+
+- Provides in-depth session analysis
+- Supports comprehensive charging tracking
+- Enables detailed user and administrative insights
+
+---
+
+Need help understanding a charging session? [Contact Support](/support) for assistance.

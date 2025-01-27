@@ -1,0 +1,205 @@
+---
+title: 'Charging Session Statistics'
+openapi: 'GET /api/v1/sessions/user/:userId/stats'
+---
+
+## Overview
+
+Retrieve comprehensive charging statistics for a specific user, providing insights into charging behavior, energy consumption, and financial metrics.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `userId` | string | Yes | Unique identifier of the user |
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `from_date` | string | No | Start date for statistics (ISO 8601 format) |
+| `to_date` | string | No | End date for statistics (ISO 8601 format) |
+| `interval` | string | No | Aggregation interval (daily, weekly, monthly) |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "stats": {
+    "total_sessions": 15,
+    "successful_sessions": 14,
+    "total_energy": 542.3,
+    "total_cost": 275.50,
+    "average_session_duration": 45,
+    "favorite_stations": [
+      {
+        "station_id": "station-uuid-1",
+        "name": "Downtown Charging Hub",
+        "total_sessions": 8
+      },
+      {
+        "station_id": "station-uuid-2",
+        "name": "Suburban Charging Point",
+        "total_sessions": 5
+      }
+    ],
+    "charging_pattern": {
+      "peak_hours": [
+        {
+          "hour": 17,
+          "sessions": 5,
+          "energy_consumed": 180.5
+        },
+        {
+          "hour": 8,
+          "sessions": 4,
+          "energy_consumed": 145.2
+        }
+      ]
+    },
+    "vehicle_performance": {
+      "total_vehicles": 2,
+      "most_used_vehicle": {
+        "make": "Tesla",
+        "model": "Model 3",
+        "total_sessions": 10
+      }
+    }
+  },
+  "sessions": [
+    {
+      "id": "session-uuid-1",
+      "start_time": "2024-01-25T14:30:00Z",
+      "end_time": "2024-01-25T16:15:00Z",
+      "energy_consumed": 35.6,
+      "cost": 18.75
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to access another user's statistics |
+| 404 | User not found | No user exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getUserSessionStats = async (userId, filters = {}) => {
+  // Construct query parameters
+  const queryParams = new URLSearchParams();
+  
+  if (filters.from_date) queryParams.append('from_date', filters.from_date);
+  if (filters.to_date) queryParams.append('to_date', filters.to_date);
+  if (filters.interval) queryParams.append('interval', filters.interval);
+
+  const response = await fetch(`/api/v1/sessions/user/${userId}/stats?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user session statistics');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const analyzeUserCharging = async (userId) => {
+  try {
+    // Fetch current year's statistics
+    const currentDate = new Date();
+    const firstDayOfYear = new Date(currentDate.getFullYear(), 0, 1);
+    
+    const yearlyStats = await getUserSessionStats(userId, {
+      from_date: firstDayOfYear.toISOString(),
+      to_date: currentDate.toISOString(),
+      interval: 'monthly'
+    });
+
+    console.log('Total Sessions:', yearlyStats.stats.total_sessions);
+    console.log('Total Energy Consumed:', yearlyStats.stats.total_energy);
+    
+    // Analyze favorite stations
+    yearlyStats.stats.favorite_stations.forEach(station => {
+      console.log(`Station: ${station.name}, Sessions: ${station.total_sessions}`);
+    });
+
+    // Examine charging patterns
+    console.log('Peak Charging Hours:', yearlyStats.stats.charging_pattern.peak_hours);
+  } catch (error) {
+    console.error('Error analyzing user charging:', error);
+  }
+};
+```
+
+## Statistical Components
+
+### Session Overview
+- Total number of sessions
+- Successful vs. failed sessions
+- Total energy consumption
+- Total charging costs
+
+### Charging Patterns
+- Peak charging hours
+- Energy consumption by time
+- Session frequency
+
+### Station Preferences
+- Most frequently used stations
+- Station distribution
+- Charging location insights
+
+### Vehicle Performance
+- Vehicles used for charging
+- Sessions per vehicle
+- Energy consumption by vehicle
+
+## Filtering Capabilities
+
+- Date range selection
+- Interval-based aggregation
+- Comprehensive statistical analysis
+
+## Access Control
+
+- Users can only access their own statistics
+- Admins can access any user's statistics
+- Sensitive information is carefully filtered
+
+## Performance Insights
+
+- Identify charging habits
+- Optimize charging strategies
+- Understand energy consumption patterns
+- Support personalized charging recommendations
+
+## Billing and Energy Tracking
+
+- Detailed cost breakdown
+- Energy consumption metrics
+- Charging efficiency analysis
+
+## Notes
+
+- Provides comprehensive user charging analytics
+- Supports flexible statistical exploration
+- Enables data-driven charging decisions
+
+---
+
+Need deeper insights into your charging history? [Contact Support](/support) for detailed analysis.

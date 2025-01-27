@@ -1,0 +1,157 @@
+---
+title: 'Start Charging Session'
+openapi: 'POST /api/v1/sessions/start'
+---
+
+## Overview
+
+Initiate a new charging session for an electric vehicle using an RFID card at a specific charging station.
+
+## Request
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "card_id": "card-uuid-123",
+  "station_info": {
+    "station_id": "station-uuid-456",
+    "initial_battery_level": 20,
+    "vehicle_type": "Electric Sedan",
+    "vehicle_make": "Tesla",
+    "vehicle_model": "Model 3"
+  }
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `card_id` | string | Yes | Unique identifier of the RFID card |
+| `station_info` | object | No | Additional charging session details |
+| `station_info.station_id` | string | No | Charging station identifier |
+| `station_info.initial_battery_level` | number | No | Starting battery percentage |
+| `station_info.vehicle_type` | string | No | Type of electric vehicle |
+| `station_info.vehicle_make` | string | No | Vehicle manufacturer |
+| `station_info.vehicle_model` | string | No | Specific vehicle model |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Session started",
+  "session": {
+    "id": "session-uuid-789",
+    "card_id": "card-uuid-123",
+    "start_time": "2024-01-27T10:30:00Z",
+    "session_status": "active",
+    "connection_attempts": 1,
+    "user_id": "user-uuid-456",
+    "station_id": "station-uuid-456",
+    "vehicle_info": {
+      "initial_battery_level": 20,
+      "vehicle_type": "Electric Sedan",
+      "vehicle_make": "Tesla",
+      "vehicle_model": "Model 3"
+    }
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid card | Card is blocked or invalid |
+| 401 | Unauthorized | Card not associated with a user |
+| 403 | Forbidden | Station not available for charging |
+| 404 | Station not found | Specified station does not exist |
+| 409 | Session conflict | Another active session exists |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const startChargingSession = async (cardId, stationInfo = {}) => {
+  const response = await fetch('/api/v1/sessions/start', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ 
+      card_id: cardId, 
+      station_info: stationInfo 
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to start charging session');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const beginCharging = async () => {
+  try {
+    const sessionData = await startChargingSession('card-uuid-123', {
+      station_id: 'station-uuid-456',
+      initial_battery_level: 20,
+      vehicle_type: 'Electric Sedan',
+      vehicle_make: 'Tesla',
+      vehicle_model: 'Model 3'
+    });
+
+    console.log('Charging Session Started:', sessionData.session);
+    return sessionData.session.id;
+  } catch (error) {
+    console.error('Error starting charging session:', error);
+  }
+};
+```
+
+## Session Initialization Process
+
+1. Validate RFID card
+2. Check card user authentication
+3. Verify station availability
+4. Record initial vehicle and charging information
+5. Create active charging session
+6. Prepare for real-time monitoring
+
+## Vehicle Information Capture
+
+Optional vehicle details help in:
+- Personalized charging experience
+- Battery management
+- Usage analytics
+- Vehicle-specific charging optimization
+
+## Charging Session Attributes
+
+- Unique session identifier
+- Associated RFID card
+- User information
+- Station details
+- Vehicle specifics
+- Initial session parameters
+
+## Notes
+
+- Comprehensive session initialization
+- Flexible vehicle information capture
+- Supports various electric vehicle types
+- Enables detailed charging tracking
+
+---
+
+Need help starting a charging session? [Contact Support](/support) for assistance.

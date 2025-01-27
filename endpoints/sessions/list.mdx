@@ -1,0 +1,169 @@
+---
+title: 'List Charging Sessions'
+openapi: 'GET /api/v1/sessions'
+---
+
+## Overview
+
+Retrieve a list of charging sessions. Regular users see their own sessions, while admins can view all sessions.
+
+## Request
+
+No request body is required. Optional query parameters can be used for filtering.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | number | No | Page number for pagination (default: 1) |
+| `limit` | number | No | Number of sessions per page (default: 10, max: 100) |
+| `status` | string | No | Filter sessions by status (e.g., 'active', 'completed') |
+| `from_date` | string | No | Start date for session filter (ISO 8601 format) |
+| `to_date` | string | No | End date for session filter (ISO 8601 format) |
+| `station_id` | string | No | Filter by specific charging station |
+| `card_id` | string | No | Filter by specific RFID card |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "sessions": [
+    {
+      "id": "session-uuid-1",
+      "card_id": "card-uuid-1",
+      "station_id": "station-uuid-1",
+      "start_time": "2024-01-25T14:30:00Z",
+      "end_time": "2024-01-25T16:15:00Z",
+      "session_status": "completed",
+      "energy_consumed": 35.6,
+      "cost": 18.75,
+      "user": {
+        "id": "user-uuid-1",
+        "email": "user1@example.com"
+      }
+    },
+    {
+      "id": "session-uuid-2",
+      "card_id": "card-uuid-2",
+      "station_id": "station-uuid-2",
+      "start_time": "2024-01-26T09:15:00Z",
+      "session_status": "active"
+    }
+  ],
+  "pagination": {
+    "total": 50,
+    "page": 1,
+    "limit": 10,
+    "total_pages": 5
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid parameters | Incorrect query parameter values |
+| 403 | Forbidden | Attempting to list sessions without proper authorization |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const listSessions = async (filters = {}) => {
+  // Construct query parameters
+  const queryParams = new URLSearchParams({
+    page: filters.page || 1,
+    limit: filters.limit || 10,
+    ...Object.fromEntries(
+      Object.entries(filters).filter(([_, v]) => v != null)
+    )
+  });
+
+  const response = await fetch(`/api/v1/sessions?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch sessions');
+  }
+
+  return await response.json();
+};
+
+// Usage examples
+const fetchUserSessions = async () => {
+  try {
+    // Fetch completed sessions from the last month
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const completedSessions = await listSessions({
+      status: 'completed',
+      from_date: oneMonthAgo.toISOString()
+    });
+
+    console.log('Completed Sessions:', completedSessions.sessions);
+  } catch (error) {
+    console.error('Error fetching sessions:', error);
+  }
+};
+
+// Admin: fetch sessions for a specific station
+const fetchStationSessions = async (stationId) => {
+  try {
+    const stationSessions = await listSessions({ 
+      station_id: stationId,
+      limit: 50 
+    });
+    console.log('Station Sessions:', stationSessions.sessions);
+  } catch (error) {
+    console.error('Error fetching station sessions:', error);
+  }
+};
+```
+
+## Session Status Types
+
+| Status | Description |
+|--------|-------------|
+| `active` | Ongoing charging session |
+| `completed` | Successfully finished session |
+| `failed` | Session terminated with errors |
+| `interrupted` | Session stopped unexpectedly |
+
+## Filtering Capabilities
+
+- Date range selection
+- Status-based filtering
+- Station and card-specific queries
+- Pagination support
+
+## Access Control
+
+- Regular users see only their own sessions
+- Admins can view all sessions
+- Sensitive user information is filtered
+
+## Performance Considerations
+
+- Default limit of 10 sessions per request
+- Maximum of 100 sessions per request
+- Supports comprehensive filtering
+
+## Notes
+
+- Provides flexible session retrieval
+- Supports detailed session tracking
+- Enables comprehensive session analysis
+
+---
+
+Need help retrieving charging sessions? [Contact Support](/support) for assistance.

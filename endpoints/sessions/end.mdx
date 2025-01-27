@@ -1,0 +1,157 @@
+---
+title: 'End Charging Session'
+openapi: 'PATCH /api/v1/sessions/:sessionId/end'
+---
+
+## Overview
+
+Terminate an active charging session, recording final charging details and calculating total energy consumption and cost.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | Yes | Unique identifier of the charging session to end |
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "cost": 25.50,
+  "energy_consumed": 45.2,
+  "final_battery_level": 80,
+  "charging_duration": 120
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `cost` | number | No | Total cost of the charging session |
+| `energy_consumed` | number | No | Total energy consumed in kWh |
+| `final_battery_level` | number | No | Battery percentage after charging |
+| `charging_duration` | number | No | Total charging time in minutes |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Session ended",
+  "session": {
+    "id": "session-uuid-789",
+    "start_time": "2024-01-27T10:30:00Z",
+    "end_time": "2024-01-27T12:30:00Z",
+    "session_status": "completed",
+    "cost": 25.50,
+    "energy_consumed": 45.2,
+    "final_battery_level": 80
+  },
+  "events": [
+    {
+      "event_type": "charging_stopped",
+      "created_at": "2024-01-27T12:30:00Z",
+      "event_data": {
+        "message": "Charging process completed",
+        "details": {
+          "energyConsumed": 45.2,
+          "totalCost": 25.50
+        }
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid session | Session cannot be ended |
+| 403 | Forbidden | Unauthorized to end this session |
+| 404 | Session not found | No active session exists |
+| 409 | Session conflict | Session already completed |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const endChargingSession = async (sessionId, sessionData) => {
+  const response = await fetch(`/api/v1/sessions/${sessionId}/end`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(sessionData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to end charging session');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const completeCharging = async (sessionId) => {
+  try {
+    const sessionResult = await endChargingSession(sessionId, {
+      cost: 25.50,
+      energy_consumed: 45.2,
+      final_battery_level: 80,
+      charging_duration: 120
+    });
+
+    console.log('Charging Session Ended:', sessionResult.session);
+    return sessionResult.session;
+  } catch (error) {
+    console.error('Error ending charging session:', error);
+  }
+};
+```
+
+## Session Termination Process
+
+1. Validate active session
+2. Verify user authorization
+3. Record final charging metrics
+4. Calculate total cost and energy
+5. Generate session completion events
+6. Update session status
+
+## Charging Session Metrics
+
+Captured information includes:
+- Total energy consumption
+- Charging duration
+- Final battery level
+- Total session cost
+- Charging events
+
+## Billing and Energy Tracking
+
+- Precise energy consumption measurement
+- Accurate cost calculation
+- Supports various pricing models
+- Enables detailed user billing
+
+## Notes
+
+- Flexible session ending parameters
+- Comprehensive session closure
+- Supports detailed charging analytics
+- Enables financial and energy tracking
+
+---
+
+Need help ending a charging session? [Contact Support](/support) for assistance.

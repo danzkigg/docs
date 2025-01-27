@@ -1,0 +1,181 @@
+---
+title: 'Charging Session Events'
+openapi: 'GET /api/v1/sessions/:sessionId/events'
+---
+
+## Overview
+
+Retrieve a detailed timeline of events for a specific charging session, providing a comprehensive view of the session's progression.
+
+## Request
+
+### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `sessionId` | string | Yes | Unique identifier of the charging session |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "events": [
+    {
+      "id": "event-uuid-1",
+      "event_type": "session_start",
+      "created_at": "2024-01-27T10:30:00Z",
+      "event_data": {
+        "message": "Charging session initiated",
+        "initial_battery_level": 20,
+        "vehicle_info": {
+          "vehicle_type": "Electric Sedan",
+          "vehicle_make": "Tesla",
+          "vehicle_model": "Model 3"
+        }
+      }
+    },
+    {
+      "id": "event-uuid-2",
+      "event_type": "charging_status",
+      "created_at": "2024-01-27T10:45:00Z",
+      "event_data": {
+        "message": "Charging in progress",
+        "current_battery_level": 35,
+        "charging_rate": 7.2,
+        "power_output": 22.5
+      }
+    },
+    {
+      "id": "event-uuid-3",
+      "event_type": "connection_status",
+      "created_at": "2024-01-27T11:15:00Z",
+      "event_data": {
+        "message": "Connector temperature check",
+        "connector_temperature": 42.5,
+        "status": "normal"
+      }
+    },
+    {
+      "id": "event-uuid-4",
+      "event_type": "charging_stopped",
+      "created_at": "2024-01-27T12:30:00Z",
+      "event_data": {
+        "message": "Charging process completed",
+        "final_battery_level": 80,
+        "energy_consumed": 45.2,
+        "total_charging_time": 120
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 403 | Forbidden | Attempting to access another user's session events |
+| 404 | Session not found | No session exists with the given ID |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const getSessionEvents = async (sessionId) => {
+  const response = await fetch(`/api/v1/sessions/${sessionId}/events`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch session events');
+  }
+
+  return await response.json();
+};
+
+// Usage example
+const analyzeSessionEvents = async (sessionId) => {
+  try {
+    const { events } = await getSessionEvents(sessionId);
+    
+    console.log('Session Event Timeline:');
+    events.forEach(event => {
+      console.log(`[${event.created_at}] ${event.event_type}:`, event.event_data);
+    });
+
+    // Find specific event types
+    const chargingStatusEvents = events.filter(
+      event => event.event_type === 'charging_status'
+    );
+    console.log('Charging Status Updates:', chargingStatusEvents);
+  } catch (error) {
+    console.error('Error fetching session events:', error);
+  }
+};
+```
+
+## Event Types
+
+| Event Type | Description |
+|-----------|-------------|
+| `session_start` | Initial session creation |
+| `charging_status` | Real-time charging progress |
+| `connection_status` | Connector and equipment status |
+| `charging_stopped` | Session termination |
+| `error_event` | Technical issues or interruptions |
+| `power_fluctuation` | Electrical supply changes |
+| `temperature_check` | Connector and battery temperature monitoring |
+
+## Event Data Components
+
+Each event typically includes:
+- Unique event identifier
+- Event type
+- Timestamp
+- Detailed event data
+- Contextual information
+
+## Detailed Event Tracking
+
+- Real-time session progression
+- Comprehensive technical monitoring
+- Diagnostic and troubleshooting information
+- Performance and safety tracking
+
+## Access Control
+
+- Users can only access events from their own sessions
+- Admins can access events from any session
+- Sensitive information is carefully filtered
+
+## Performance Insights
+
+- Identify charging patterns
+- Monitor equipment performance
+- Detect potential technical issues
+- Support predictive maintenance
+
+## Troubleshooting Support
+
+- Detailed event logs
+- Technical diagnostic information
+- Chronological session progression
+- Error detection and analysis
+
+## Notes
+
+- Provides granular session tracking
+- Supports comprehensive charging analytics
+- Enables deep technical insights
+- Helps improve charging infrastructure
+
+---
+
+Need help understanding session events? [Contact Support](/support) for assistance.
