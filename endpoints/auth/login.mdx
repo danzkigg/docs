@@ -1,0 +1,71 @@
+---
+title: 'Login'
+openapi: 'POST /api/v1/auth/login'
+---
+
+## Overview
+
+Authenticate and obtain access tokens for the EV Charging Management API.
+
+## Request
+
+### Payload
+
+<RequestExample>
+```json
+{
+  "email": "user@example.com",
+  "password": "yourSecurePassword123"
+}
+```
+</RequestExample>
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `email` | string | Yes | User's registered email address |
+| `password` | string | Yes | User's account password |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Login successful",
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "user-uuid-123",
+    "email": "user@example.com",
+    "role": "user"
+  }
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Missing credentials | Email or password not provided |
+| 401 | Invalid credentials | Incorrect email or password |
+| 429 | Too many attempts | Exceeded login attempt limit |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const login = async (email, password) => {
+  const response = await fetch('/api/v1/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  return await response.json();
+};
+```

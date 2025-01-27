@@ -1,0 +1,63 @@
+---
+title: 'Logout'
+openapi: 'POST /api/v1/auth/logout'
+---
+
+## Overview
+
+Invalidate the current session and refresh token, logging the user out of the system.
+
+## Request
+
+No request body is required. The logout is performed using the current authentication context.
+
+### Headers
+
+| Header | Value | Required | Description |
+|--------|-------|----------|-------------|
+| `Authorization` | `Bearer <access_token>` | Yes | Valid access token |
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 401 | Unauthorized | Invalid or expired access token |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const logout = async () => {
+  const response = await fetch('/api/v1/auth/logout', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  // Clear local storage or session
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('user');
+
+  return await response.json();
+};
+```
+
+## Additional Notes
+
+- Calling this endpoint will:
+  - Invalidate the current refresh token
+  - Clear server-side session
+  - Require re-authentication for future requests

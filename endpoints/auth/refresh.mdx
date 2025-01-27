@@ -1,0 +1,73 @@
+---
+title: 'Token Refresh'
+openapi: 'POST /api/v1/auth/refresh'
+---
+
+## Overview
+
+Obtain a new access token using a valid refresh token when the current access token has expired.
+
+## Request
+
+No request body is required. The refresh is performed using the refresh token stored in an HTTP-only cookie.
+
+### Headers
+
+This endpoint does not require additional headers as it uses the existing refresh token cookie.
+
+## Response
+
+### Success Response
+
+<ResponseExample>
+```json
+{
+  "accessToken": "new.jwt.access.token.here",
+  "message": "Token refreshed successfully"
+}
+```
+</ResponseExample>
+
+### Possible Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 401 | Unauthorized | Invalid or expired refresh token |
+| 403 | Forbidden | Refresh token is no longer valid |
+| 500 | Internal server error | Unexpected server-side error |
+
+## Example
+
+```javascript
+const refreshToken = async () => {
+  try {
+    const response = await fetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      credentials: 'include' // Important for sending cookies
+    });
+
+    if (!response.ok) {
+      throw new Error('Token refresh failed');
+    }
+
+    const data = await response.json();
+    
+    // Update stored access token
+    localStorage.setItem('accessToken', data.accessToken);
+
+    return data.accessToken;
+  } catch (error) {
+    // Handle refresh failure (e.g., force logout)
+    console.error('Token refresh failed', error);
+    // Potentially redirect to login or clear local storage
+    return null;
+  }
+};
+```
+
+## Additional Notes
+
+- Refresh tokens are valid for 7 days
+- A new refresh token may be issued with each successful refresh
+- Always store refresh tokens in HTTP-only cookies for security
+- If refresh fails, user must log in again
