@@ -1,0 +1,135 @@
+---
+title: 'Users'
+description: 'Manage user accounts and profiles in the EV Charging Management API'
+---
+
+# Users
+
+## Overview
+
+The Users API provides comprehensive user management capabilities, allowing administrators to create, update, and manage user accounts within the EV Charging Management system.
+
+## User Roles
+
+### Role Hierarchy
+- **Admin**: Full system access
+  - Create and manage users
+  - Access all system data
+  - Perform administrative actions
+
+- **User**: Standard user access
+  - Manage personal profile
+  - View own charging sessions
+  - Manage personal RFID cards
+
+## User Profile Attributes
+
+A typical user profile includes:
+- Personal Information
+  - First Name
+  - Last Name
+  - Email Address
+  - Phone Number
+
+- Contact Details
+  - Address Line 1
+  - Address Line 2
+  - City
+  - State
+  - Postal Code
+  - Country
+
+- Account Metadata
+  - User ID
+  - Registration Date
+  - Account Status
+  - Preferred Payment Method
+
+## User Management Capabilities
+
+### Key Features
+- User registration
+- Profile management
+- Role-based access control
+- Account status tracking
+- Comprehensive user overview
+
+### User Overview (Admin Only)
+
+Retrieve comprehensive user information including cards, sessions, and support history.
+
+## Best Practices
+
+### User Management
+- Implement strong password policies
+- Use role-based access control
+- Regularly audit user accounts
+- Protect user personal information
+
+### Security Recommendations
+- Enforce multi-factor authentication
+- Implement account lockout policies
+- Use secure password hashing
+- Limit login attempts
+
+## Common Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Invalid user data | Incorrect or incomplete user information |
+| 403 | Not authorized | Insufficient permissions for the action |
+| 409 | User already exists | Duplicate email or conflicting user data |
+| 500 | Server error | Internal processing error |
+
+## User Statistics
+
+Users can track their:
+- Total charging sessions
+- Energy consumption
+- Total spending
+- Favorite charging stations
+
+## Code Examples
+
+### Create a User
+```javascript
+const createUser = async (userData) => {
+  const response = await fetch('/api/v1/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(userData)
+  });
+
+  return await response.json();
+};
+```
+
+### Update User Profile
+```javascript
+const updateUserProfile = async (userId, updateData) => {
+  const response = await fetch(`/api/v1/users/${userId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  return await response.json();
+};
+```
+
+## Compliance and Privacy
+
+- GDPR compliant user data handling
+- Secure data storage
+- User consent management
+- Data portability support
+
+---
+
+Need more information? [Contact Support](/support) for assistance with user management.

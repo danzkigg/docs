@@ -17,17 +17,72 @@
       "group": "Getting Started",
       "pages": [
         "introduction",
-        "authentication",
+        "authentication"
+      ]
+    },
+    {
+      "group": "Resources",
+      "pages": [
+        "users",
         "rfid-cards",
-        "charging-sessions",
-        "charging-stations"
+        "charging-stations",
+        "charging-sessions"
       ]
     },
     {
       "group": "Endpoints",
       "pages": [
-        "endpoints/stations-create",
-        "endpoints/stations-list"
+        {
+          "group": "Authentication",
+          "pages": [
+            "endpoints/auth/login",
+            "endpoints/auth/logout",
+            "endpoints/auth/refresh"
+          ]
+        },
+        {
+          "group": "Users",
+          "pages": [
+            "endpoints/users/create",
+            "endpoints/users/list",
+            "endpoints/users/get",
+            "endpoints/users/update",
+            "endpoints/users/delete",
+            "endpoints/users/profile"
+          ]
+        },
+        {
+          "group": "RFID Cards",
+          "pages": [
+            "endpoints/cards/create",
+            "endpoints/cards/list",
+            "endpoints/cards/get",
+            "endpoints/cards/update",
+            "endpoints/cards/delete"
+          ]
+        },
+        {
+          "group": "Charging Stations",
+          "pages": [
+            "endpoints/stations/create",
+            "endpoints/stations/list",
+            "endpoints/stations/get",
+            "endpoints/stations/update",
+            "endpoints/stations/delete",
+            "endpoints/stations/stats"
+          ]
+        },
+        {
+          "group": "Charging Sessions",
+          "pages": [
+            "endpoints/sessions/start",
+            "endpoints/sessions/end",
+            "endpoints/sessions/list",
+            "endpoints/sessions/get",
+            "endpoints/sessions/events",
+            "endpoints/sessions/stats"
+          ]
+        }
       ]
     },
     {
