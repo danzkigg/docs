@@ -1,0 +1,181 @@
+---
+title: 'Authentication'
+description: 'Secure access to the EV Charging Management API'
+---
+
+# Authentication
+
+## Overview
+
+The EV Charging Management API uses JSON Web Tokens (JWT) for secure authentication. This ensures that only authorized users can access specific endpoints and perform actions based on their role.
+
+## Authentication Flow
+
+### 1. Login
+
+To access the API, you must first authenticate by obtaining an access token.
+
+<RequestExample>
+```bash
+POST /api/v1/auth/login
+```
+
+```json
+{
+  "email": "user@example.com",
+  "password": "your_password"
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Login successful",
+  "accessToken": "jwt.access.token",
+  "user": {
+    "id": "user-uuid",
+    "email": "user@example.com",
+    "role": "user"
+  }
+}
+```
+</ResponseExample>
+
+### 2. Using the Access Token
+
+Include the access token in the `Authorization` header for all subsequent API requests:
+
+```bash
+Authorization: Bearer your_access_token_here
+```
+
+## Token Types
+
+### Access Token
+- Short-lived (15 minutes)
+- Used for authenticating API requests
+- Must be included in the `Authorization` header
+
+### Refresh Token
+- Stored in an HTTP-only cookie
+- Used to obtain a new access token when the current one expires
+- Longer-lived (7 days)
+
+## Token Refresh
+
+When an access token expires, use the refresh token to obtain a new access token:
+
+<RequestExample>
+```bash
+POST /api/v1/auth/refresh
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "accessToken": "new.jwt.access.token"
+}
+```
+</ResponseExample>
+
+## Logout
+
+To logout and invalidate the refresh token:
+
+<RequestExample>
+```bash
+POST /api/v1/auth/logout
+```
+</RequestExample>
+
+## Authorization Roles
+
+The API supports multiple user roles:
+
+1. **Admin**
+   - Full system access
+   - Can manage users, stations, and view all data
+   - Highest level of permissions
+
+2. **User**
+   - Limited access
+   - Can manage own cards and view own sessions
+   - Restricted from administrative functions
+
+## Error Handling
+
+### Common Authentication Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 401 | Unauthorized | Invalid or expired access token |
+| 403 | Forbidden | Insufficient permissions for the requested action |
+| 400 | Bad Request | Missing or invalid login credentials |
+
+## Security Best Practices
+
+- Keep your access token confidential
+- Store tokens securely
+- Implement token refresh mechanism
+- Use HTTPS for all API communications
+- Implement proper error handling for authentication failures
+
+## Code Example: Authentication Flow
+
+```javascript
+// Login and store tokens
+const login = async (email, password) => {
+  try {
+    const response = await fetch('/api/v1/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+    
+    // Store access token and user info
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('user', JSON.stringify(data.user));
+
+    return data;
+  } catch (error) {
+    console.error('Login failed', error);
+  }
+};
+
+// Refresh token when needed
+const refreshToken = async () => {
+  try {
+    const response = await fetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      credentials: 'include' // Important for sending cookies
+    });
+
+    const data = await response.json();
+    localStorage.setItem('accessToken', data.accessToken);
+
+    return data.accessToken;
+  } catch (error) {
+    // Handle refresh failure (e.g., logout user)
+    console.error('Token refresh failed', error);
+  }
+};
+```
+
+## Troubleshooting
+
+- Ensure you're using the correct API version
+- Check that your credentials are correct
+- Verify that you have the necessary permissions for the requested action
+- Check network connectivity and API endpoint
+
+---
+
+Need help? [Contact Support](/support) for assistance with authentication.

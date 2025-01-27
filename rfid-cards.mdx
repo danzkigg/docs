@@ -1,0 +1,238 @@
+---
+title: 'RFID Cards'
+description: 'Manage RFID cards for electric vehicle charging'
+---
+
+# RFID Cards
+
+## Overview
+
+RFID cards are the primary method of identification and authentication for users in the EV Charging Management API. Each card is uniquely associated with a user and is used to initiate and track charging sessions.
+
+## Card Lifecycle
+
+### Card States
+- **Active**: Card is valid and can be used for charging
+- **Blocked**: Card is temporarily or permanently disabled
+- **Pending**: Card has been created but not yet activated
+
+## Endpoints
+
+### Generate a New Card Identifier
+Get a unique card identifier for card creation.
+
+<RequestExample>
+```bash
+GET /api/v1/cards/next-id
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "nextIdentifier": "EVCharged-000001"
+}
+```
+</ResponseExample>
+
+### Create a Card (User)
+Create a new RFID card for the authenticated user.
+
+<RequestExample>
+```bash
+POST /api/v1/cards
+```
+
+```json
+{
+  "card_identifier": "EVCharged-000001"
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Card created",
+  "card": {
+    "id": "card-uuid",
+    "user_id": "user-uuid",
+    "card_identifier": "EVCharged-000001",
+    "status": "active"
+  }
+}
+```
+</ResponseExample>
+
+### Create a Card (Admin)
+Admins can create a card and assign it to a specific user.
+
+<RequestExample>
+```bash
+POST /api/v1/cards/admin
+```
+
+```json
+{
+  "user_id": "user-uuid",
+  "card_identifier": "EVCharged-000002"
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Card assigned successfully",
+  "card": {
+    "id": "card-uuid",
+    "user_id": "user-uuid",
+    "card_identifier": "EVCharged-000002",
+    "status": "active"
+  }
+}
+```
+</ResponseExample>
+
+### List Cards
+Retrieve all RFID cards (Admin only).
+
+<RequestExample>
+```bash
+GET /api/v1/cards
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "cards": [
+    {
+      "id": "card-uuid-1",
+      "card_identifier": "EVCharged-000001",
+      "status": "active",
+      "user": {
+        "id": "user-uuid-1",
+        "email": "user1@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+      }
+    },
+    {
+      "id": "card-uuid-2",
+      "card_identifier": "EVCharged-000002",
+      "status": "blocked",
+      "user": {
+        "id": "user-uuid-2",
+        "email": "user2@example.com",
+        "first_name": "Jane",
+        "last_name": "Smith"
+      }
+    }
+  ]
+}
+```
+</ResponseExample>
+
+### Update a Card (Admin)
+Modify card details or reassign a card.
+
+<RequestExample>
+```bash
+PATCH /api/v1/cards/:cardId
+```
+
+```json
+{
+  "user_id": "new-user-uuid",
+  "status": "active"
+}
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Card updated successfully",
+  "card": {
+    "id": "card-uuid",
+    "user_id": "new-user-uuid",
+    "status": "active"
+  }
+}
+```
+</ResponseExample>
+
+### Delete a Card (Admin)
+Remove a card from the system.
+
+<RequestExample>
+```bash
+DELETE /api/v1/cards/:cardId
+```
+</RequestExample>
+
+#### Response
+<ResponseExample>
+```json
+{
+  "message": "Card deleted"
+}
+```
+</ResponseExample>
+
+## Card Identifier Format
+
+Card identifiers follow a specific format:
+- Prefix: `EVCharged-`
+- Followed by a 6-digit sequential number
+- Example: `EVCharged-000001`
+
+## Best Practices
+
+- Always generate a unique card identifier before creating a card
+- Verify card status before use
+- Implement proper error handling for card operations
+- Keep card identifiers confidential
+
+## Common Errors
+
+| Status Code | Error Message | Description |
+|------------|--------------|-------------|
+| 400 | Card identifier already exists | Attempt to create a duplicate card |
+| 403 | Admins only | Non-admin attempting an admin-only operation |
+| 404 | Card not found | Requested card does not exist |
+
+## Code Example: Card Management
+
+```javascript
+// Generate a new card identifier
+const getNextCardId = async () => {
+  const response = await fetch('/api/v1/cards/next-id');
+  const { nextIdentifier } = await response.json();
+  return nextIdentifier;
+};
+
+// Create a new card
+const createCard = async (cardIdentifier) => {
+  const response = await fetch('/api/v1/cards', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({ card_identifier: cardIdentifier })
+  });
+
+  return await response.json();
+};
+```
+
+---
+
+Need more information? [Contact Support](/support) for assistance with RFID card management.
